@@ -1,0 +1,7 @@
+version: "3"
+services:
+  shiny:
+    image: g2p-frysk
+    build: .
+    ports:
+      - "3838:3838"
