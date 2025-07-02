@@ -1,4 +1,4 @@
-# G2P_Frysk
+# G2P-Frysk
 Software for converting West Frisian text to phonetic IPA transcriptions.
 
 Follow the instructions below to build the Docker image and launch the container.
@@ -6,8 +6,8 @@ Follow the instructions below to build the Docker image and launch the container
 ### 1. Clone the Repo
 
 ```
-git clone https://github.com/fryske-akademy/G2P_Frysk.git
-cd G2P_Frysk
+git clone https://github.com/fryske-akademy/G2P-Frysk.git
+cd G2P-Frysk
 ```
 
 ### 2. Build the Docker Image
