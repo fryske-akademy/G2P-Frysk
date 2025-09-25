@@ -154,10 +154,6 @@ ui <- tagList(
         p("G2P Frysk is a web app for converting Frisian text to phonetic IPA transcriptions. The following people were involved in the development of G2P Frysk: Wilbert Heeringa (Fryske Akademy, implementation G2P Frysk), Eduard Drenth (Fryske Akademy, building web service), Hans Van de Velde (Fryske Akademy, project manager), Pieter Duijff (Fryske Akademy, advice), Jelske Dijkstra (Fryske Akademy, advice), Hindrik Sijens (Fryske Akademy, advice). Comments are welcome and can be sent to", img(src = 'email.png', height = 19, align = "center"),"."),
         br(),
 
-        h5(strong("GitHub")),
-        p("The source code of this app and a command line script are available in the", a("Fryske Akademy Github repository", href = "https://github.com/fryske-akademy/G2P-Frysk", target = "_blank"), "."),
-        br(),
-
         h5(strong("System requirements")),
         p("G2P Frysk runs best on a computer with a monitor with a minimum resolution of 1370 x 870 (width x height). The use of Chrome, Chromium, Firefox or Opera as a web browser is to be preferred."),
         br(),
@@ -284,9 +280,9 @@ server <- function(input, output, session)
 
   builtins <- import_builtins()
   lingpy   <- import("lingpy")
-  
+
   ##############################################################################
-  
+
   output$aceEditor <- renderUI(
   {
     aceEditor(
@@ -479,7 +475,7 @@ server <- function(input, output, session)
       if (gi!=lemma)
       {
         lemma <- num2word(lemma)
-        p <- unlist(system(command = paste0("/opt/venv/bin/phonetisaurus predict --model /srv/shiny-server/www/g2p_stress.fst --casing ignore ", lemma), intern = TRUE))
+        p <- unlist(system(command = paste0("phonetisaurus predict --model www/g2p_stress.fst --casing ignore ", lemma), intern = TRUE))
         sep <- str_locate(p, " ")[1]
         pl <- substr(p, sep+1, nchar(p))
         pl <- gsub(" ", "", pl)
@@ -554,7 +550,7 @@ server <- function(input, output, session)
     p <- gsub("-$", "", p)
     p <- num2word(p)
     p <- tolower(paste(p, collapse = " "))
-    
+
     if (input$selModel=="excl. primary stress marks")
       m <- "g2p.fst"
     if (input$selModel=="incl. primary stress marks")
@@ -562,9 +558,9 @@ server <- function(input, output, session)
 
     if (p!="")
     {
-      p <- unlist(system(command = paste0("/opt/venv/bin/phonetisaurus predict --model /srv/shiny-server/www/", m, " --casing ignore ", p), intern = TRUE))
-    
-      if ((length(p))== nrow(ud))
+      p <- unlist(system(command = paste0("phonetisaurus predict --model www/", m, " --casing ignore ", p), intern = TRUE))
+
+      if (length(p) == nrow(ud))
       {
         df <- data.frame()
         
@@ -578,17 +574,23 @@ server <- function(input, output, session)
           pi <- gsub(" ", "", pi)
           pi <- gsub("tt$", "t", pi)
           pi <- checkWithF(gi, pi, tolower(ud$lemma[i]), ud$upos[i])
+
+          if ((gi=="In") | (gi=="in"))
+            pi <- "ən"
           
+          if ((gi=="It") | (gi=="it"))
+            pi <- "ət"
+
           if ((pi!="kykyky") & (pi!="kˈykyky") & (input$selModel=="incl. primary stress marks"))
             pi <- checkStress(gi, pi, tolower(ud$lemma[i]), ud$upos[i])
-          
+
           df <- rbind(df, data.frame(graphemic=gi, phonemic=pi))
         }
         
         df$graphemic <- ud$token
         df$lemma     <- ud$lemma
         df$upos      <- ud$upos
-  
+
         df$phonemic  <- gsub( "kykyky", "...", df$phonemic)
         df$phonemic  <- gsub("kˈykyky", "...", df$phonemic)
 
@@ -602,7 +604,7 @@ server <- function(input, output, session)
         for (i in 1:length(diphtriph))
         {
           df$phonemic <- gsub(diphtriph[i], diphtriph0[i], df$phonemic)
-          
+
           diphtriph2  <- sub(" ", "ˈ ", diphtriph[i])
           diphtriph20 <- paste0("ˈ", diphtriph0[i])
           
@@ -613,7 +615,7 @@ server <- function(input, output, session)
           
           df$phonemic <- gsub(diphtriph3, diphtriph30, df$phonemic)
         }
-        
+
         df$phonemic <- gsub("ˈ " , " ˈ", df$phonemic)
         df$phonemic <- gsub("^ ˈ", "ˈ" , df$phonemic)
 
@@ -646,10 +648,10 @@ server <- function(input, output, session)
     s <- str_replace_all(s, "^\\’(?=([:alpha:][:alpha:]))", "")
     s <- str_replace_all(s, "(?<=([:space:]|[:punct:]))\\’(?=([:alpha:][:alpha:]))", " ")
     s <- str_replace_all(s, "\\’ ", " ")
-    s <- str_replace_all(s, "\\’$", "") 
-	  
+    s <- str_replace_all(s, "\\’$", "")
+
     if (nchar(s) > 0)
-	    return(annotateUD(s)[,8:10])
+      return(annotateUD(s)[,8:10])
     else
     {
       showNotification("The text is empty or consists only of unknown tokens!", type = "error")
@@ -661,7 +663,7 @@ server <- function(input, output, session)
   {
     req(checkText())
     result <- processText(checkText())
-    
+
     if (is.data.frame(result))
       return(graph2phon(result))
     else
@@ -753,8 +755,8 @@ server <- function(input, output, session)
       all <- gsub(ph, paste0(" ", ph), all)
     }
 
-    phonemes1 <- c("aː i̯", "ɔˑ u̯", "j oˑ u̯", "j ɛ", "ɪˑ ə", "øˑ ə", "aˑ i̯", "j ɪ", "iˑ ə", "ɛˑ i̯", "oː i̯", "u̯ a", "oˑ ə", "uˑ i̯", "o i̯", "ɔˑ u̯", "u̯ o i̯", "j ø", "øˑ ə", "u̯ o", "œˑ i̯")
-    phonemes2 <- c("aːi̯" , "ɔˑu̯" , "joˑu̯"  , "jɛ" , "ɪˑə" , "øˑə" , "aˑi̯" , "jɪ" , "iˑə" , "ɛˑi̯" , "oːi̯" , "u̯a" , "oˑə" , "uˑi̯" , "oi̯" , "ɔˑu̯" , "u̯oi̯"  , "jø" , "øˑə" , "u̯o" , "œˑi̯" )
+    phonemes1 <- diphtriph
+    phonemes2 <- diphtriph0
 
     for (i in 1:length(phonemes1))
     {
