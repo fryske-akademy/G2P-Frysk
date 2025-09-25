@@ -29,9 +29,8 @@ http://localhost:3838
 
 ### Command line script
 
-graph2phon is a command line script in R. View the header of the code for installation instructions and run:
+graph2phon.R is an R command-line script. For installation instructions, check the header of the code. To see available options, run:
 
 ```
 Rscript graph2phon.R -h
 ```
-for options.
