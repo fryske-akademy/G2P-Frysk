@@ -36,3 +36,5 @@ graph2phon.R is an R command-line script. For installation instructions, check t
 ```
 Rscript graph2phon.R -h
 ```
+</p>
+
