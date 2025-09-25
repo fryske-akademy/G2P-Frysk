@@ -27,7 +27,7 @@ docker run -p 3838:3838 g2p-frysk
 Open:
 http://localhost:3838
 
-<style>p { line-height: 1.5; } </style>
+<p style="line-height:1.5;">
 
 #### Command line script
 
