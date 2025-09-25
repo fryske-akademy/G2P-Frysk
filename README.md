@@ -26,3 +26,12 @@ docker run -p 3838:3838 g2p-frysk
 
 Open:
 http://localhost:3838
+
+### Command line script
+
+graph2phon is a command line script in R. View the header of the code for installation instructions and run:
+
+```
+Rscript graph2phon.R -h
+```
+for options.
