@@ -603,8 +603,8 @@ server <- function(input, output, session)
         
         for (i in 1:length(diphtriph))
         {
-          df$phonemic <- gsub(diphtriph[i], diphtriph0[i], df$phonemic)
-
+          df$phonemic <- gsub(paste0(diphtriph[i], "(?![ˑːo])"), diphtriph0[i], df$phonemic, perl = TRUE)
+          
           diphtriph2  <- sub(" ", "ˈ ", diphtriph[i])
           diphtriph20 <- paste0("ˈ", diphtriph0[i])
           
