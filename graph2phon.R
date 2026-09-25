@@ -11,16 +11,27 @@
 # Before running the script for the first time, enter the following commands   #
 # in a terminal:                                                               #
 #                                                                              #
-# $ sudo pip3 install phonetisaurus                                            #
-# $ sudo pip3 install lingpy                                                   #
-# $ ln -s /usr/bin/python3.8 /usr/bin/python3                                  #
+# $ sudo apt update                                                            #
 #                                                                              #
-# $ sudo apt install r-base-core                                               #
-# $ sudo apt install libcurl4-openssl-dev                                      #
-# $ sudo apt install libxml2                                                   #
-# $ sudo apt install libxml2-dev                                               #
-# $ sudo apt install libpoppler-cpp-dev                                        #
-# $ sudo apt install libssl-dev                                                #
+# $ sudo apt install \                                                         #
+#       r-base \                                                               #
+#       python3 \                                                              #
+#       python3-venv \                                                         #
+#       python3-dev \                                                          #
+#       phonetisaurus                                                          #
+#       libcurl4-openssl-dev \                                                 #
+#       libxml2 \                                                              #
+#       libxml2-dev \                                                          #
+#       libpoppler-cpp-dev \                                                   #
+#       libssl-dev                                                             #
+#                                                                              #
+# $ python3 -m venv ~/.virtualenvs/graph2phon                                  #
+# $ ~/.virtualenvs/graph2phon/bin/pip install --upgrade pip                    #
+# $ ~/.virtualenvs/graph2phon/bin/pip install lingpy                           #
+#                                                                              #
+# Check whether Python works:                                                  #
+# $ ~/.virtualenvs/graph2phon/bin/python \                                     #
+#       -c "import lingpy; print(lingpy.__version__)"                          #
 #                                                                              #
 # When running the script for the first time, missing R packages are installed #
 # which can take a while!                                                      #
@@ -66,7 +77,7 @@
 
 # install and load packages
 
-packages = c("optparse", "readr", "readtext", "xml2", "rvest", "openxlsx", "stringr", "reticulate", "udpipe")
+packages = c("optparse", "readr", "readtext", "xml2", "rvest", "openxlsx", "stringr", "reticulate", "udpipe", "processx")
 
 for (p in packages)
 {
@@ -83,8 +94,7 @@ for (p in packages)
   }
 }
 
-if (!py_module_available('lingpy'))
-  reticulate::py_install('lingpy', pip = TRUE)
+use_python("~/.virtualenvs/graph2phon/bin/python", required = TRUE)
 
 builtins <- import_builtins()
 lingpy   <- import("lingpy")
@@ -232,8 +242,8 @@ if (trimws(s) == "")
 
 # process text
 
-segments   <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o", "ə", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ", "p", "b", "t", "d", "ʈ", "ɖ", "c", "ɟ", "k", "ɡ", "q", "ɢ", "ʔ", "m", "ɱ", "n", "ɳ", "ɲ", "ŋ", "ʙ", "r", "ʀ", "ⱱ", "ɾ", "ɽ", "ɸ", "β", "f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "ʂ", "ʐ", "ç", "ʝ", "x", "ɣ", "χ", "ʁ", "ħ", "ʕ", "h", "ɦ", "ɬ", "ɮ", "ʋ", "ɹ", "ɻ", "j", "ɰ", "l", "ɭ", "ʎ", "ʟ", "w")
-vowels     <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "u̯", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ")
+segments   <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "u̯", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o", "ə", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ", "p", "b", "t", "d", "ʈ", "ɖ", "c", "ɟ", "k", "ɡ", "q", "ɢ", "ʔ", "m", "ɱ", "n", "ɳ", "ɲ", "ŋ", "ʙ", "r", "ʀ", "ⱱ", "ɾ", "ɽ", "ɸ", "β", "f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "ʂ", "ʐ", "ç", "ʝ", "x", "ɣ", "χ", "ʁ", "ħ", "ʕ", "h", "ɦ", "ɬ", "ɮ", "ʋ", "ɹ", "ɻ", "j", "ɰ", "l", "ɭ", "ʎ", "ʟ", "w")
+vowels     <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "u̯", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o",      "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ")
 diphtriph  <- c("j oˑ u̯", "j ɔˑ u̯", "j u u̯", "j yˑ u̯", "u̯ aˑ i̯", "u̯ aː i̯", "u̯ o i̯", "aˑ i̯", "aˑ ĩ̯", "aː i̯", "ɛˑ i̯", "iˑ ə", "iˑ ə̃", "ɪˑ ə", "iˑ u̯", "oˑ ə", "oˑ ə̃", "o i̯", "oː i̯", "oˑ u̯", "ɔ i̯", "ɔˑ u̯", "œˑ i̯", "øˑ ə", "uˑ ə", "yˑ ə", "uˑ i̯", "j a", "j ɛ", "j ɪ", "j o", "j ɔ", "u̯ a", "u̯ aː", "u̯ ãː", "u̯ o", "u̯ õ")
 diphtriph0 <- gsub(" ", "", diphtriph)
 
@@ -328,6 +338,41 @@ num2word <- function(p)
   return(p)
 }
 
+run_phonetisaurus <- function(model, words)
+{
+  words <- unlist(strsplit(words, "\\s+"))
+  words <- words[nzchar(words)]
+  
+  result <- processx::run(
+    command = "phonetisaurus",
+    args = c(
+      "predict",
+      "--model", model,
+      "--casing", "ignore",
+      words
+    ),
+    stdout = "|",
+    stderr = "|",
+    error_on_status = FALSE
+  )
+  
+  if (result$status != 0)
+  {
+    cat(
+      "\nPhonetisaurus exited with status ",
+      result$status,
+      ":\n",
+      result$stderr,
+      "\n",
+      file = stderr()
+    )
+    
+    quit(status = 1, save = "no")
+  }
+  
+  strsplit(result$stdout, "\n", fixed = TRUE)[[1]]
+}
+
 checkStress <- function(gi, pi, lemma, upos)
 {
   ns <- str_count(pi, "ˈ")
@@ -337,7 +382,7 @@ checkStress <- function(gi, pi, lemma, upos)
     if (gi!=lemma)
     {
       lemma <- num2word(lemma)
-      p <- unlist(system(command = paste0("phonetisaurus predict --model g2p_stress.fst --casing ignore ", lemma), intern = TRUE))
+      p <- run_phonetisaurus("g2p_stress.fst", lemma)
       sep <- str_locate(p, " ")[1]
       pl <- substr(p, sep+1, nchar(p))
       pl <- gsub(" ", "", pl)
@@ -420,7 +465,7 @@ graph2phon <- function(ud, stress)
 
   if (p!="")
   {
-    p <- unlist(system(command = paste0("phonetisaurus predict --model ", m, " --casing ignore ", p), intern = TRUE))
+    p <- run_phonetisaurus(m, p)
     
     if (length(p) == nrow(ud))
     {
@@ -465,8 +510,8 @@ graph2phon <- function(ud, stress)
 
       for (i in 1:length(diphtriph))
       {
-        df$phonemic <- gsub(diphtriph[i], diphtriph0[i], df$phonemic)
-          
+        df$phonemic <- gsub(paste0(diphtriph[i], "(?=[^ˑːo]*$)"), diphtriph0[i], df$phonemic, perl = TRUE)
+        
         diphtriph2  <- sub(" ", "ˈ ", diphtriph[i])
         diphtriph20 <- paste0("ˈ", diphtriph0[i])
           
