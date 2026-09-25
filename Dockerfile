@@ -8,7 +8,6 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y python3-dev
 RUN apt-get install -y python3-venv
 RUN apt-get install -y wget 
-RUN apt-get install -y curl
 RUN apt-get install -y libcurl4-openssl-dev
 RUN apt-get install -y libxml2
 RUN apt-get install -y libxml2-dev
