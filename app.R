@@ -12,6 +12,7 @@ library(stringr)
 library(reticulate); use_virtualenv("/opt/venv", required = TRUE);
 library(udpipe)
 library(ggplot2)
+library(processx)
 
 # sudo apt install python3-pip
 # sudo pip3 install phonetisaurus
@@ -180,6 +181,7 @@ ui <- tagList(
           tags$li(tags$span(HTML("<span style='color:blue'>xml2</span>"), p("Hadley Wickham, Jim Hester and Jeroen Ooms (2021). xml2: Parse XML. R package version 1.3.3. https://CRAN.R-project.org/package=xml2"))),
           tags$li(tags$span(HTML("<span style='color:blue'>rvest</span>"), p("Hadley Wickham (2021). rvest: Easily Harvest (Scrape) Web Pages. R package version 1.0.2. https://CRAN.R-project.org/package=rvest"))),
           tags$li(tags$span(HTML("<span style='color:blue'>openxlsx</span>"), p("Philipp Schauberger and Alexander Walker (2020). openxlsx: Read, Write and Edit xlsx Files. R package version 4.2.3. https://CRAN.R-project.org/package=openxlsx"))),
+          tags$li(tags$span(HTML("<span style='color:blue'>processx</span>"), p("Csárdi G, Chang W (2026). _processx: Execute and Control System   Processes_. R package version 3.9.0. https://doi.org/10.32614/CRAN.package.processx"))),
           tags$li(tags$span(HTML("<span style='color:blue'>stringr</span>"), p("Hadley Wickham (2019). stringr: Simple, Consistent Wrappers for Common String Operations. R package version 1.4.0. https://CRAN.R-project.org/package=stringr"))),
           tags$li(tags$span(HTML("<span style='color:blue'>reticulate</span>"), p("Ushey K, Allaire J, Tang Y (2024). _reticulate: Interface to 'Python'_. R package version 1.40.0. https://doi.org/10.32614/CRAN.package.reticulate"))),
           tags$li(tags$span(HTML("<span style='color:blue'>udpipe</span>"), p("Wijffels J (2023). _udpipe: Tokenization, Parts of Speech Tagging, Lemmatization and Dependency Parsing with the 'UDPipe' 'NLP' Toolkit_. R package version 0.8.11. https://doi.org/10.32614/CRAN.package.udpipe"))),
@@ -273,8 +275,8 @@ server <- function(input, output, session)
 
   global$model <- udpipe_load_model(file = paste0("www/frisian_frysk-ud-1.00-240313.udpipe"))
   
-  segments   <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o", "ə", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ", "p", "b", "t", "d", "ʈ", "ɖ", "c", "ɟ", "k", "ɡ", "q", "ɢ", "ʔ", "m", "ɱ", "n", "ɳ", "ɲ", "ŋ", "ʙ", "r", "ʀ", "ⱱ", "ɾ", "ɽ", "ɸ", "β", "f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "ʂ", "ʐ", "ç", "ʝ", "x", "ɣ", "χ", "ʁ", "ħ", "ʕ", "h", "ɦ", "ɬ", "ɮ", "ʋ", "ɹ", "ɻ", "j", "ɰ", "l", "ɭ", "ʎ", "ʟ", "w")
-  vowels     <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "u̯", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ")
+  segments   <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "u̯", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o", "ə", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ", "p", "b", "t", "d", "ʈ", "ɖ", "c", "ɟ", "k", "ɡ", "q", "ɢ", "ʔ", "m", "ɱ", "n", "ɳ", "ɲ", "ŋ", "ʙ", "r", "ʀ", "ⱱ", "ɾ", "ɽ", "ɸ", "β", "f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "ʂ", "ʐ", "ç", "ʝ", "x", "ɣ", "χ", "ʁ", "ħ", "ʕ", "h", "ɦ", "ɬ", "ɮ", "ʋ", "ɹ", "ɻ", "j", "ɰ", "l", "ɭ", "ʎ", "ʟ", "w")
+  vowels     <- c("i", "y", "ỹ", "ɨ", "ʉ", "ɯ", "u", "u̯", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ", "ɤ", "o",      "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ")
   diphtriph  <- c("j oˑ u̯", "j ɔˑ u̯", "j u u̯", "j yˑ u̯", "u̯ aˑ i̯", "u̯ aː i̯", "u̯ o i̯", "aˑ i̯", "aˑ ĩ̯", "aː i̯", "ɛˑ i̯", "iˑ ə", "iˑ ə̃", "ɪˑ ə", "iˑ u̯", "oˑ ə", "oˑ ə̃", "o i̯", "oː i̯", "oˑ u̯", "ɔ i̯", "ɔˑ u̯", "œˑ i̯", "øˑ ə", "uˑ ə", "yˑ ə", "uˑ i̯", "j a", "j ɛ", "j ɪ", "j o", "j ɔ", "u̯ a", "u̯ aː", "u̯ ãː", "u̯ o", "u̯ õ")
   diphtriph0 <- gsub(" ", "", diphtriph)
 
@@ -466,6 +468,43 @@ server <- function(input, output, session)
     return(p)
   }
 
+  run_phonetisaurus <- function(model, words)
+  {
+    # Maak van een zin afzonderlijke argumenten
+    words <- unlist(strsplit(words, "\\s+"))
+    words <- words[nzchar(words)]
+    
+    result <- processx::run(
+      command = "phonetisaurus",
+      args = c(
+        "predict",
+        "--model", model,
+        "--casing", "ignore",
+        words
+      ),
+      stdout = "|",
+      stderr = "|",
+      error_on_status = FALSE
+    )
+    
+    if (result$status != 0)
+    {
+      showNotification(
+        paste(
+          "Phonetisaurus exited with status",
+          result$status,
+          result$stderr
+        ),
+        type = "error",
+        duration = NULL
+      )
+      
+      return(character(0))
+    }
+    
+    strsplit(result$stdout, "\n", fixed = TRUE)[[1]]
+  }
+  
   checkStress <- function(gi, pi, lemma, upos)
   {
     ns <- str_count(pi, "ˈ")
@@ -475,7 +514,7 @@ server <- function(input, output, session)
       if (gi!=lemma)
       {
         lemma <- num2word(lemma)
-        p <- unlist(system(command = paste0("phonetisaurus predict --model www/g2p_stress.fst --casing ignore ", lemma), intern = TRUE))
+        p <- run_phonetisaurus("www/g2p_stress.fst", lemma)
         sep <- str_locate(p, " ")[1]
         pl <- substr(p, sep+1, nchar(p))
         pl <- gsub(" ", "", pl)
@@ -558,7 +597,7 @@ server <- function(input, output, session)
 
     if (p!="")
     {
-      p <- unlist(system(command = paste0("phonetisaurus predict --model www/", m, " --casing ignore ", p), intern = TRUE))
+      p <- run_phonetisaurus(paste0("www/", m), p)
 
       if (length(p) == nrow(ud))
       {
@@ -603,7 +642,7 @@ server <- function(input, output, session)
         
         for (i in 1:length(diphtriph))
         {
-          df$phonemic <- gsub(paste0(diphtriph[i], "(?![ˑːo])"), diphtriph0[i], df$phonemic, perl = TRUE)
+          df$phonemic <- gsub(paste0(diphtriph[i], "(?=[^ˑːo]*$)"), diphtriph0[i], df$phonemic, perl = TRUE)
           
           diphtriph2  <- sub(" ", "ˈ ", diphtriph[i])
           diphtriph20 <- paste0("ˈ", diphtriph0[i])
