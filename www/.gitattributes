@@ -1,0 +1,1 @@
+www/g2p.fst filter=lfs diff=lfs merge=lfs -text
